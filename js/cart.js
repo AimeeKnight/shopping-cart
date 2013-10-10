@@ -7,13 +7,13 @@ var Item = Backbone.Model.extend({
 
 var Cart = Backbone.Collection.extend({
   model: Item,
-  // initialize: function() {
-  //   this.on("add", this.updateSet, this);
-  // },
-  // //update Cart collection when adding new items
-  // updateSet: function() {
-  //   items = this.models;
-  // }
+  initialize: function() {
+    this.on("add", this.updateSet, this);
+  },
+  //update Cart collection when adding new items
+  updateSet: function() {
+    items = this.models;
+  }
 });
 
 var items = [
