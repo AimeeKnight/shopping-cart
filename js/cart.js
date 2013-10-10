@@ -1,13 +1,14 @@
 var Item = Backbone.Model.extend({
 	defaults: {
 		price: 35,
-		photo: "http://aimeemarieknight.com/wp-content/uploads/2013/08/1377384423_github_square_black.png"
+		photo: "img/shopping_bag.png"
 	}
 });
 
 var Cart = Backbone.Collection.extend({
 	model: Item
 });
+
 var items = [
   { title: "Macbook Air", price: 799 },
   { title: "Macbook Pro", price: 999 },
@@ -15,6 +16,7 @@ var items = [
   { title: "Magic Mouse", price: 50 },
   { title: "Cinema Display", price: 799 }
 ];
+
 var cartCollection = new Cart(items);
 
 var ItemView = Backbone.View.extend({
@@ -30,22 +32,47 @@ var ItemView = Backbone.View.extend({
 });
 
 var CartCollectionView = Backbone.View.extend({
-  el: $("#yourcart"),
+  el: "body",
+  events: {
+    "submit #add": "addItem" //A
+  },
   initialize: function() {
-    this.collection = cartCollection;
-    this.render();
+    this.itemView = new ItemCollectionView(); //2
   },
-  render: function() {
-    this.collection.each(function(item) {
-      this.renderItem(item);
-      //this refers to CartCollectionView Class
-    }, this);
-  },
-  renderItem: function(item) {
-    var itemView = new ItemView({ model: item });
-    this.$el.append(itemView.render().el); 
+  addItem: function(e) { //B
+    e.preventDefault();
+    //calling CartCollectionView's itemView's (which is ItemCollectionView), addItem()
+    this.itemView.addItem(); 
   }
 });
+
+var ItemCollectionView = Backbone.View.extend({
+  el: '#yourcart',
+  initialize: function() {
+    this.collection = cartCollection; //3
+    this.render();
+  },
+  render: function() { //4
+    this.$el.html("");
+    this.collection.each(function(item) {
+      this.renderItem(item);
+    //this refers to ItemCollectionView Class  
+    }, this);
+  },
+  renderItem: function(item) { //5
+    var itemView = new ItemView({model: item});
+    this.$el.append(itemView.render().el);
+  },
+  addItem: function() { //C
+    var data = {};
+    $("#add").children("input[type='text']").each(function(i, el) {
+      data[el.id] = $(el).val();
+    });
+    var newItem = new Item(data);
+    this.collection.add(newItem);
+    this.renderItem(newItem);
+  }       
+});
 $(function() {
-  var cart = new CartCollectionView();
+  var cart = new CartCollectionView(); //1
 });

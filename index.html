@@ -5,12 +5,19 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
   </head>
   <body>
+    <form id="add">
+      <label>Title</label>
+      <input id="title" type="text" />
+      <label>Price</label>
+      <input id="price" type="text" />
+      <input type="submit" value="save" />
+    </form> 
     <div id="yourcart"></div>
         <script id="itemTemplate" type="text/template">
         <img src="<%= photo %>" alt="<%= title %>">
         <div>
           <h2><%= title %></h2>
-          <h4>&pound;<%= price %></h4>
+          <h4>&#36;<%= price %></h4>
         </div>
     </script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
