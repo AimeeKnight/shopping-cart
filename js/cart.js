@@ -34,7 +34,9 @@ var ItemView = Backbone.View.extend({
 var CartCollectionView = Backbone.View.extend({
   el: "body",
   events: {
-    "submit #add": "addItem" //A
+    "submit #add": "addItem", //A
+    "submit #filter": "filterItems",
+    "click #clear-filter": "clearFilter"
   },
   initialize: function() {
     this.itemView = new ItemCollectionView(); //2
@@ -43,6 +45,14 @@ var CartCollectionView = Backbone.View.extend({
     e.preventDefault();
     //calling CartCollectionView's itemView's (which is ItemCollectionView), addItem()
     this.itemView.addItem(); 
+  },
+  filterItems: function(e) {
+    e.preventDefault();
+    this.itemView.filterByPrice();
+  },
+  clearFilter: function(e) {
+    e.preventDefault();
+    this.itemView.clearFilter();
   }
 });
 
@@ -51,6 +61,9 @@ var ItemCollectionView = Backbone.View.extend({
   initialize: function() {
     this.collection = cartCollection; //3
     this.render();
+    //when 'reset' event triggered call render() with context bound to this (ItemCollectionView),
+    //When detecting collection reset re-render the view
+    this.collection.on("reset", this.render, this);
   },
   render: function() { //4
     this.$el.html("");
@@ -71,8 +84,25 @@ var ItemCollectionView = Backbone.View.extend({
     var newItem = new Item(data);
     this.collection.add(newItem);
     this.renderItem(newItem);
-  }       
+  },
+  filterByPrice: function() {
+    //first reset the collection
+    //but do it silently so the event doesn't trigger
+    this.collection.reset(items, { silent: true });
+    var max = parseFloat($("#less-than").val(), 10);
+    var filtered = _.filter(this.collection.models, function(item) {
+      return item.get("price") < max;
+    });
+    //trigger reset again
+    //but this time trigger the event so the collection view is rerendered
+    this.collection.reset(filtered);
+  },
+  clearFilter: function() {
+    $("#less-than").val("");
+    this.collection.reset(items);
+  }
 });
+
 $(function() {
   var cart = new CartCollectionView(); //1
 });
